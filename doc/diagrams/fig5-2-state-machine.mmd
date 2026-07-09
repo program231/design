@@ -1,0 +1,19 @@
+stateDiagram-v2
+    [*] --> Created: 创建任务
+    Created --> SchemaMigrating: 启动结构迁移
+    SchemaMigrating --> SchemaDone: DBCat完成
+    SchemaDone --> FullMigrating: 启动全量
+    FullMigrating --> FullDone: 全量完成
+    FullDone --> IncrStarting: 启动增量
+    IncrStarting --> IncrSyncing: Store与IncrSync运行
+    IncrSyncing --> Verifying: 触发校验
+    Verifying --> VerifyDone: 校验通过
+    VerifyDone --> Switching: 业务切换
+    Switching --> Completed: 完成
+    SchemaMigrating --> Failed: 异常
+    FullMigrating --> Failed: 异常
+    IncrSyncing --> Failed: 异常
+    Verifying --> Repairing: 发现差异
+    Repairing --> Verifying: 订正后重验
+    Failed --> [*]
+    Completed --> [*]

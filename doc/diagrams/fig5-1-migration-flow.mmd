@@ -1,0 +1,8 @@
+flowchart LR
+    Create[创建任务] --> PreCheck[预检查]
+    PreCheck --> Schema[结构迁移]
+    Schema --> Full[全量迁移]
+    Full --> Incr[增量同步]
+    Incr --> Verify[数据校验]
+    Verify --> Switch[业务切换]
+    Switch --> Done[完成]

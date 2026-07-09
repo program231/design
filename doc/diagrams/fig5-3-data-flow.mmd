@@ -1,0 +1,16 @@
+flowchart TB
+    subgraph batchFlow [全量数据流DataX]
+        Reader[Reader读取] --> Channel[Channel通道]
+        Channel --> Writer[Writer写入]
+    end
+
+    subgraph streamFlow [增量数据流FlinkCDC]
+        Binlog[Binlog日志] --> StoreComp[Store拉取]
+        StoreComp --> FlinkJob[Flink CDC作业]
+        FlinkJob --> TargetSink[写入目标库]
+    end
+
+    SourceDB[(源数据库)] --> Reader
+    SourceDB --> Binlog
+    Writer --> TargetDB[(目标数据库)]
+    TargetSink --> TargetDB

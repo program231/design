@@ -1,0 +1,20 @@
+flowchart LR
+    subgraph controlPlane [控制平面]
+        API[API服务]
+        Orchestrator[编排引擎]
+        Scheduler2[调度器]
+        MetaDB2[(元数据库)]
+    end
+
+    subgraph dataPlane2 [数据平面]
+        Source[(源库)]
+        Target[(目标库)]
+        Engines[执行引擎]
+    end
+
+    API --> Orchestrator
+    Orchestrator --> Scheduler2
+    Orchestrator --> MetaDB2
+    Scheduler2 --> Engines
+    Engines --> Source
+    Engines --> Target

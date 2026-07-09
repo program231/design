@@ -1,0 +1,60 @@
+flowchart TB
+    subgraph accessLayer [服务接入层]
+        Console[管理控制台]
+        OpenAPI[OpenAPI]
+        CLI[CLI/SDK]
+    end
+
+    subgraph orchestrationLayer [流程编排层]
+        TaskOrchestrator[任务编排引擎]
+        WorkflowEngine[工作流引擎]
+        MetaService[元数据服务]
+        DatasourceMgr[数据源管理]
+    end
+
+    subgraph executionLayer [执行引擎层]
+        SchemaEngine[Schema转换引擎]
+        BatchEngine[全量引擎DataX]
+        StreamEngine[增量引擎FlinkCDC]
+        VerifyEngine[校验引擎]
+    end
+
+    subgraph infraLayer [基础设施层]
+        Scheduler[调度器]
+        ResourcePool[资源池]
+        HA[高可用组件]
+        Monitor[监控告警]
+        MetaDB[(元数据库)]
+        TSDB[(时序库)]
+    end
+
+    subgraph dataPlane [数据平面]
+        SourceDB[(源数据库)]
+        TargetDB[(目标数据库)]
+        LogStore[(增量日志存储)]
+    end
+
+    Console --> OpenAPI
+    CLI --> OpenAPI
+    OpenAPI --> TaskOrchestrator
+    TaskOrchestrator --> WorkflowEngine
+    WorkflowEngine --> SchemaEngine
+    WorkflowEngine --> BatchEngine
+    WorkflowEngine --> StreamEngine
+    WorkflowEngine --> VerifyEngine
+    TaskOrchestrator --> MetaService
+    TaskOrchestrator --> DatasourceMgr
+    Scheduler --> BatchEngine
+    Scheduler --> StreamEngine
+    SchemaEngine --> SourceDB
+    SchemaEngine --> TargetDB
+    BatchEngine --> SourceDB
+    BatchEngine --> TargetDB
+    StreamEngine --> SourceDB
+    StreamEngine --> LogStore
+    StreamEngine --> TargetDB
+    VerifyEngine --> SourceDB
+    VerifyEngine --> TargetDB
+    HA --> Scheduler
+    Monitor --> TSDB
+    MetaService --> MetaDB

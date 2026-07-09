@@ -1,0 +1,56 @@
+flowchart TB
+    subgraph platform [迁移平台模块组成]
+        subgraph mgmt [管理与接入]
+            ConsoleUI[控制台UI]
+            APIGateway[API网关]
+            AuthModule[认证鉴权]
+        end
+
+        subgraph core [核心服务]
+            OrchestratorSvc[任务编排服务]
+            WorkflowSvc[工作流服务]
+            MetadataSvc[元数据服务]
+            DSRegistry[数据源注册中心]
+        end
+
+        subgraph engines [执行组件]
+            DBCat[DBCat结构转换]
+            FullImport[FullImport全量导入]
+            Store[Store增量拉取]
+            IncrSync[IncrSync增量同步]
+            Checker[FullVerification校验]
+            Supervisor[Supervisor组件监控]
+        end
+
+        subgraph plugins [插件层]
+            ReaderPlugins[Reader插件]
+            WriterPlugins[Writer插件]
+            CDCConnectors[CDC连接器]
+            TypeMapper[类型映射器]
+        end
+
+        subgraph runtime [运行时]
+            DataXRuntime[DataX引擎运行时]
+            FlinkCluster[Flink集群]
+            WorkerPool[Worker节点池]
+        end
+    end
+
+    ConsoleUI --> APIGateway
+    APIGateway --> OrchestratorSvc
+    OrchestratorSvc --> WorkflowSvc
+    OrchestratorSvc --> MetadataSvc
+    OrchestratorSvc --> DSRegistry
+    WorkflowSvc --> DBCat
+    WorkflowSvc --> FullImport
+    WorkflowSvc --> Store
+    WorkflowSvc --> IncrSync
+    WorkflowSvc --> Checker
+    Supervisor --> engines
+    FullImport --> DataXRuntime
+    FullImport --> ReaderPlugins
+    FullImport --> WriterPlugins
+    Store --> CDCConnectors
+    IncrSync --> FlinkCluster
+    DBCat --> TypeMapper
+    DataXRuntime --> WorkerPool
