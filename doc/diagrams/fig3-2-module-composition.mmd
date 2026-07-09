@@ -14,24 +14,24 @@ flowchart TB
         end
 
         subgraph engines [执行组件]
-            DBCat[DBCat结构转换]
-            FullImport[FullImport全量导入]
-            Store[Store增量拉取]
-            IncrSync[IncrSync增量同步]
-            Checker[FullVerification校验]
-            Supervisor[Supervisor组件监控]
+            DBCat[DBCat]
+            FullImport[FullImport]
+            Store[Store]
+            IncrSync[IncrSync]
+            Checker[FullVerification]
+            Supervisor[Supervisor]
         end
 
         subgraph plugins [插件层]
             ReaderPlugins[Reader插件]
             WriterPlugins[Writer插件]
-            CDCConnectors[CDC连接器]
+            LogAdapters[日志适配器]
             TypeMapper[类型映射器]
         end
 
-        subgraph runtime [运行时]
-            DataXRuntime[DataX引擎运行时]
-            FlinkCluster[Flink集群]
+        subgraph runtime [平台运行时]
+            SyncWorker[SyncWorker全量Worker]
+            StreamRuntime[StreamRuntime增量运行时]
             WorkerPool[Worker节点池]
         end
     end
@@ -47,10 +47,11 @@ flowchart TB
     WorkflowSvc --> IncrSync
     WorkflowSvc --> Checker
     Supervisor --> engines
-    FullImport --> DataXRuntime
+    FullImport --> SyncWorker
     FullImport --> ReaderPlugins
     FullImport --> WriterPlugins
-    Store --> CDCConnectors
-    IncrSync --> FlinkCluster
+    Store --> LogAdapters
+    IncrSync --> StreamRuntime
     DBCat --> TypeMapper
-    DataXRuntime --> WorkerPool
+    SyncWorker --> WorkerPool
+    StreamRuntime --> WorkerPool

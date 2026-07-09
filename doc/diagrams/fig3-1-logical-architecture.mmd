@@ -13,10 +13,11 @@ flowchart TB
     end
 
     subgraph executionLayer [执行引擎层]
-        SchemaEngine[Schema转换引擎]
-        BatchEngine[全量引擎DataX]
-        StreamEngine[增量引擎FlinkCDC]
-        VerifyEngine[校验引擎]
+        SchemaEngine[DBCat结构转换]
+        FullImport[FullImport全量导入]
+        Store[Store增量拉取]
+        IncrSync[IncrSync增量同步]
+        VerifyEngine[FullVerification校验]
     end
 
     subgraph infraLayer [基础设施层]
@@ -39,20 +40,23 @@ flowchart TB
     OpenAPI --> TaskOrchestrator
     TaskOrchestrator --> WorkflowEngine
     WorkflowEngine --> SchemaEngine
-    WorkflowEngine --> BatchEngine
-    WorkflowEngine --> StreamEngine
+    WorkflowEngine --> FullImport
+    WorkflowEngine --> Store
+    WorkflowEngine --> IncrSync
     WorkflowEngine --> VerifyEngine
     TaskOrchestrator --> MetaService
     TaskOrchestrator --> DatasourceMgr
-    Scheduler --> BatchEngine
-    Scheduler --> StreamEngine
+    Scheduler --> FullImport
+    Scheduler --> Store
+    Scheduler --> IncrSync
     SchemaEngine --> SourceDB
     SchemaEngine --> TargetDB
-    BatchEngine --> SourceDB
-    BatchEngine --> TargetDB
-    StreamEngine --> SourceDB
-    StreamEngine --> LogStore
-    StreamEngine --> TargetDB
+    FullImport --> SourceDB
+    FullImport --> TargetDB
+    Store --> SourceDB
+    Store --> LogStore
+    IncrSync --> LogStore
+    IncrSync --> TargetDB
     VerifyEngine --> SourceDB
     VerifyEngine --> TargetDB
     HA --> Scheduler

@@ -397,8 +397,8 @@ flowchart LR
 | 维度 | OceanBase OMS | 本平台设计 | 差异原因 |
 |------|---------------|-----------|----------|
 | 目标端 | 绑定 OceanBase | 开放多种目标库 | 通用平台定位 |
-| 全量引擎 | 自研 Full-Import | 基于 DataX | 复用 70+ 异构插件 |
-| 增量引擎 | 自研 Store + Incr-Sync | Flink CDC + Store 抽象 | 复用 Flink Exactly-once 与 Connector 生态 |
+| 全量引擎 | 自研 Full-Import | 自研 FullImport（借鉴 DataX 管道模型） | 吸收 DataX 设计思想，平台内实现 |
+| 增量引擎 | 自研 Store + Incr-Sync | 自研 Store + IncrSync（借鉴 Flink 运行时） | 吸收 Flink 设计思想，平台内实现 |
 | 结构迁移 | 自研 DBCat（OB 原生） | SchemaEngine（借鉴 DBCat） | 需支持非 OB 目标端映射 |
 | 架构分层 | 三层（接入/编排/组件） | 四层（+基础设施层） | 解耦资源管理与执行引擎 |
 | Record 格式 | DML/DDL/HB | 沿用 DML/DDL/HB | 直接借鉴 |
