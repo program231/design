@@ -1,21 +1,24 @@
 sequenceDiagram
-    participant User as 用户
-    participant Orch as 任务编排
-    participant DBCat as DBCat
-    participant Full as FullImport
-    participant Store as Store
-    participant Incr as IncrSync
-    participant Verify as FullVerification
+    participant U as 用户
+    participant O as 编排服务
+    participant S as 结构迁移
+    participant F as 全量迁移
+    participant I as 增量链路
+    participant V as 数据校验
 
-    User->>Orch: 创建并启动迁移任务
-    Orch->>Orch: 预检查
-    Orch->>DBCat: 结构迁移
-    DBCat-->>Orch: Schema完成
-    Orch->>Full: 全量迁移
-    Full-->>Orch: 全量完成并记录位点
-    Orch->>Store: 启动增量拉取
-    Orch->>Incr: 启动增量同步
-    Incr-->>Orch: 延迟降至阈值
-    Orch->>Verify: 数据校验
-    Verify-->>Orch: 校验通过
-    Orch->>User: 可执行业务切换
+    Note over U,O: 准备
+    U->>O: 创建并启动任务
+    O->>O: 预检查
+
+    Note over O,S: 执行
+    O->>S: 启动结构迁移
+    S-->>O: Schema与映射完成
+    O->>F: 启动全量并记录位点
+    F-->>O: 全量完成
+    O->>I: 启动 Store 与 IncrSync
+    I-->>O: 延迟降至阈值
+
+    Note over O,V: 收尾
+    O->>V: 启动校验
+    V-->>O: 校验通过
+    O-->>U: 可执行业务切换

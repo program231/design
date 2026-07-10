@@ -1,16 +1,28 @@
 flowchart TB
-    subgraph batchFlow [全量数据流]
-        Reader[Reader读取] --> Channel[Channel通道]
-        Channel --> Writer[Writer写入]
+    Source[(源数据库)]
+    Target[(目标数据库)]
+
+    subgraph fullPath [全量数据路径]
+        direction LR
+        R[Reader] --> Ch[Channel]
+        Ch --> W[Writer]
     end
 
-    subgraph streamFlow [增量数据流]
-        Binlog[源端变更日志] --> StoreComp[Store拉取解析]
-        StoreComp --> IncrComp[IncrSync应用]
-        IncrComp --> TargetSink[写入目标库]
+    subgraph incrPath [增量数据路径]
+        direction LR
+        Log[变更日志] --> Store[Store]
+        Store --> Q[Record队列]
+        Q --> Incr[IncrSync]
     end
 
-    SourceDB[(源数据库)] --> Reader
-    SourceDB --> Binlog
-    Writer --> TargetDB[(目标数据库)]
-    TargetSink --> TargetDB
+    subgraph verifyPath [校验数据路径]
+        direction LR
+        V[FullVerification] --> Diff[差异报告与订正SQL]
+    end
+
+    Source --> R
+    Source --> Log
+    W --> Target
+    Incr --> Target
+    Source --> V
+    Target --> V

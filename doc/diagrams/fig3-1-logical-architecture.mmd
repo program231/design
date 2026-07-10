@@ -1,41 +1,43 @@
 flowchart TB
-    subgraph platform [迁移平台]
-        subgraph access [服务接入层]
-            Console[管理控制台]
-            API[OpenAPI]
-            Auth[认证鉴权]
-        end
-
-        subgraph orch [流程编排层]
-            TaskOrch[任务编排]
-            WF[工作流引擎]
-            Meta[元数据服务]
-            DS[数据源管理]
-        end
-
-        subgraph exec [执行引擎层]
-            DBCat[DBCat]
-            FullImport[FullImport]
-            Store[Store]
-            IncrSync[IncrSync]
-            Verify[FullVerification]
-        end
-
-        subgraph infra [基础设施层]
-            Sched[调度器]
-            Pool[资源池]
-            HA[高可用]
-            Mon[监控告警]
-        end
+    subgraph access [服务接入层]
+        Console[控制台]
+        API[API网关]
+        Auth[认证鉴权]
     end
+
+    subgraph orch [流程编排层]
+        Task[任务编排]
+        WF[工作流]
+        Meta[元数据服务]
+        DS[数据源管理]
+    end
+
+    subgraph exec [执行引擎层]
+        DBCat[DBCat]
+        Full[FullImport]
+        Store[Store]
+        Incr[IncrSync]
+        Verify[FullVerification]
+    end
+
+    subgraph infra [基础设施层]
+        Sched[调度器]
+        Pool[资源池]
+        HA[高可用]
+        Mon[监控告警]
+    end
+
+    Console --> API --> Task
+    Task --> WF
+    WF --> exec
+    Sched --> exec
+    Meta --> Task
+    DS --> Task
 
     Source[(源数据库)] --> exec
     Target[(目标数据库)] --> exec
     MetaDB[(元数据库)] --> orch
     MetaDB --> infra
 
-    Console --> API
-    API --> TaskOrch
-    TaskOrch --> WF
-    WF --> exec
-    Sched --> exec
+    access --> orch --> exec
+    infra --> exec

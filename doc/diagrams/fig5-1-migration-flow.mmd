@@ -1,8 +1,26 @@
-flowchart LR
-    Create[创建任务] --> PreCheck[预检查]
-    PreCheck --> Schema[结构迁移]
-    Schema --> Full[全量迁移]
-    Full --> Incr[增量同步]
-    Incr --> Verify[数据校验]
-    Verify --> Switch[业务切换]
-    Switch --> Done[完成]
+flowchart TB
+    subgraph prepare [准备阶段]
+        A1[创建任务]
+        A2[预检查]
+        A1 --> A2
+    end
+
+    subgraph execute [执行阶段]
+        B1["结构迁移<br/>DBCat"]
+        B2["全量迁移<br/>FullImport"]
+        B3["增量同步<br/>Store + IncrSync"]
+        B1 --> B2 --> B3
+    end
+
+    subgraph finish [收尾阶段]
+        C1["数据校验<br/>FullVerification"]
+        C2[业务切换]
+        C3[完成]
+        C1 --> C2 --> C3
+    end
+
+    A2 -->|通过| B1
+    A2 -.->|失败| Fail[终止或返回修改]
+    B3 -->|延迟达标| C1
+    C1 -.->|有差异| Repair[订正后复检]
+    Repair --> C1
