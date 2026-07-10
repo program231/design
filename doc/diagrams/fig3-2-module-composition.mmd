@@ -1,29 +1,37 @@
 flowchart TB
-    subgraph platform [迁移平台]
-        subgraph framework [迁移框架]
-            subgraph row1 [功能模块]
-                Access[接入与编排<br/>控制台 API 编排 工作流]
-                Schema[结构与元数据<br/>DBCat 元数据 数据源]
-                Batch[全量与校验<br/>FullImport Verification]
-                Incr[增量同步<br/>Store IncrSync]
-            end
-
-            subgraph cross [横切能力]
-                Mon[监控告警]
-                Sched[调度与HA]
-                Sup[Supervisor]
-            end
-
-            subgraph core [Migration Core]
-                CoreItems[Record模型 · Channel · 插件容器 · 配置中心 · 通信统计]
-            end
-
-            row1 --> core
-            cross -.-> row1
-        end
+    subgraph access [服务接入层]
+        direction LR
+        P1[传输项目管理]
+        P2[数据源管理]
+        P3[运维监控]
+        P4[告警设置]
     end
 
-    Source[(源数据库)] --> framework
-    Target[(目标数据库)] --> framework
-    Meta[(元数据库)] --> framework
-    StoreExt[(消息与对象存储)] --> framework
+    subgraph orch [流程编排层]
+        direction LR
+        O1[数据库对象迁移]
+        O2[数据迁移]
+        O3[数据同步]
+        O4[数据校验]
+        O5[链路切换]
+    end
+
+    subgraph comps [组件层]
+        direction LR
+        C1[DBCat<br/>转换引擎]
+        C2[Store<br/>增量拉取]
+        C3[FullImport<br/>全量导入]
+        C4[IncrSync<br/>增量同步]
+        C5[FullVerification<br/>全量校验]
+        C6[AIEngine<br/>智能辅助]
+    end
+
+    Sup[Supervisor 组件监控]
+
+    access --> orch --> comps
+    C1 --- Sup
+    C2 --- Sup
+    C3 --- Sup
+    C4 --- Sup
+    C5 --- Sup
+    C6 --- Sup
