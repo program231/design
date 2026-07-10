@@ -1,64 +1,41 @@
 flowchart TB
-    subgraph accessLayer [服务接入层]
-        Console[管理控制台]
-        OpenAPI[OpenAPI]
-        CLI[CLI/SDK]
+    subgraph platform [迁移平台]
+        subgraph access [服务接入层]
+            Console[管理控制台]
+            API[OpenAPI]
+            Auth[认证鉴权]
+        end
+
+        subgraph orch [流程编排层]
+            TaskOrch[任务编排]
+            WF[工作流引擎]
+            Meta[元数据服务]
+            DS[数据源管理]
+        end
+
+        subgraph exec [执行引擎层]
+            DBCat[DBCat]
+            FullImport[FullImport]
+            Store[Store]
+            IncrSync[IncrSync]
+            Verify[FullVerification]
+        end
+
+        subgraph infra [基础设施层]
+            Sched[调度器]
+            Pool[资源池]
+            HA[高可用]
+            Mon[监控告警]
+        end
     end
 
-    subgraph orchestrationLayer [流程编排层]
-        TaskOrchestrator[任务编排引擎]
-        WorkflowEngine[工作流引擎]
-        MetaService[元数据服务]
-        DatasourceMgr[数据源管理]
-    end
+    Source[(源数据库)] --> exec
+    Target[(目标数据库)] --> exec
+    MetaDB[(元数据库)] --> orch
+    MetaDB --> infra
 
-    subgraph executionLayer [执行引擎层]
-        SchemaEngine[DBCat结构转换]
-        FullImport[FullImport全量导入]
-        Store[Store增量拉取]
-        IncrSync[IncrSync增量同步]
-        VerifyEngine[FullVerification校验]
-    end
-
-    subgraph infraLayer [基础设施层]
-        Scheduler[调度器]
-        ResourcePool[资源池]
-        HA[高可用组件]
-        Monitor[监控告警]
-        MetaDB[(元数据库)]
-        TSDB[(时序库)]
-    end
-
-    subgraph dataPlane [数据平面]
-        SourceDB[(源数据库)]
-        TargetDB[(目标数据库)]
-        LogStore[(增量日志存储)]
-    end
-
-    Console --> OpenAPI
-    CLI --> OpenAPI
-    OpenAPI --> TaskOrchestrator
-    TaskOrchestrator --> WorkflowEngine
-    WorkflowEngine --> SchemaEngine
-    WorkflowEngine --> FullImport
-    WorkflowEngine --> Store
-    WorkflowEngine --> IncrSync
-    WorkflowEngine --> VerifyEngine
-    TaskOrchestrator --> MetaService
-    TaskOrchestrator --> DatasourceMgr
-    Scheduler --> FullImport
-    Scheduler --> Store
-    Scheduler --> IncrSync
-    SchemaEngine --> SourceDB
-    SchemaEngine --> TargetDB
-    FullImport --> SourceDB
-    FullImport --> TargetDB
-    Store --> SourceDB
-    Store --> LogStore
-    IncrSync --> LogStore
-    IncrSync --> TargetDB
-    VerifyEngine --> SourceDB
-    VerifyEngine --> TargetDB
-    HA --> Scheduler
-    Monitor --> TSDB
-    MetaService --> MetaDB
+    Console --> API
+    API --> TaskOrch
+    TaskOrch --> WF
+    WF --> exec
+    Sched --> exec

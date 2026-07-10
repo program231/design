@@ -1,57 +1,45 @@
 flowchart TB
-    subgraph platform [迁移平台模块组成]
-        subgraph mgmt [管理与接入]
-            ConsoleUI[控制台UI]
-            APIGateway[API网关]
-            AuthModule[认证鉴权]
-        end
+    subgraph platform [迁移平台 Migration Platform]
+        subgraph framework [迁移框架 Migration Framework]
+            subgraph crossCut [横切能力]
+                Monitor[监控告警]
+                Scheduler[调度与HA]
+                Supervisor[Supervisor]
+            end
 
-        subgraph core [核心服务]
-            OrchestratorSvc[任务编排服务]
-            WorkflowSvc[工作流服务]
-            MetadataSvc[元数据服务]
-            DSRegistry[数据源注册中心]
-        end
+            subgraph schemaBlock [结构与元数据]
+                DBCat[DBCat Schema转换]
+                MetaSvc[元数据服务]
+                DSReg[数据源注册]
+            end
 
-        subgraph engines [执行组件]
-            DBCat[DBCat]
-            FullImport[FullImport]
-            Store[Store]
-            IncrSync[IncrSync]
-            Checker[FullVerification]
-            Supervisor[Supervisor]
-        end
+            subgraph batchBlock [全量与校验]
+                FullImport[FullImport 全量迁移]
+                Verify[FullVerification 校验]
+            end
 
-        subgraph plugins [插件层]
-            ReaderPlugins[Reader插件]
-            WriterPlugins[Writer插件]
-            LogAdapters[日志适配器]
-            TypeMapper[类型映射器]
-        end
+            subgraph accessBlock [接入与编排]
+                Console[控制台与API]
+                Orchestrator[任务编排]
+                Workflow[工作流]
+            end
 
-        subgraph runtime [平台运行时]
-            SyncWorker[SyncWorker全量Worker]
-            StreamRuntime[StreamRuntime增量运行时]
-            WorkerPool[Worker节点池]
+            subgraph incrBlock [增量同步]
+                Store[Store 增量拉取]
+                IncrSync[IncrSync 增量应用]
+            end
+
+            subgraph core [Migration Core]
+                RecordModel[Record模型]
+                Channel[Channel传输]
+                PluginContainer[插件容器]
+                ConfigCenter[配置中心]
+                Stats[通信统计]
+            end
         end
     end
 
-    ConsoleUI --> APIGateway
-    APIGateway --> OrchestratorSvc
-    OrchestratorSvc --> WorkflowSvc
-    OrchestratorSvc --> MetadataSvc
-    OrchestratorSvc --> DSRegistry
-    WorkflowSvc --> DBCat
-    WorkflowSvc --> FullImport
-    WorkflowSvc --> Store
-    WorkflowSvc --> IncrSync
-    WorkflowSvc --> Checker
-    Supervisor --> engines
-    FullImport --> SyncWorker
-    FullImport --> ReaderPlugins
-    FullImport --> WriterPlugins
-    Store --> LogAdapters
-    IncrSync --> StreamRuntime
-    DBCat --> TypeMapper
-    SyncWorker --> WorkerPool
-    StreamRuntime --> WorkerPool
+    SourceDB[(源数据库)] --> framework
+    TargetDB[(目标数据库)] --> framework
+    MetaDB[(元数据库)] --> framework
+    Storage[(消息与对象存储)] --> framework
