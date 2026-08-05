@@ -1,2 +1,6 @@
+*.class
+*.jar
 node_modules/
 package-lock.json
+!platform/**/src/**
+platform/**/target/

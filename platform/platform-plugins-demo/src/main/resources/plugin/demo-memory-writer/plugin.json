@@ -1,0 +1,6 @@
+{
+  "name": "demo-memory-writer",
+  "type": "WRITER",
+  "class": "com.migration.platform.plugins.demo.DemoMemoryWriter",
+  "version": "0.1.0"
+}

@@ -1,13 +1,25 @@
 # design
 
-迁移平台设计文档
+迁移平台设计文档 + Java 8 基础框架
 
 ## 主交付文档
 
 | 文档 | 格式 | 说明 |
 |------|------|------|
-| **[迁移平台软件设计说明书](doc/迁移平台软件设计说明书.md)** | Markdown | **主交付文档（SDD v3.3）**：架构、模块、流程设计 |
+| **[迁移平台软件设计说明书](doc/迁移平台软件设计说明书.md)** | Markdown | **主交付文档（SDD v3.4）**：架构、模块、流程设计 |
 | **[迁移平台软件设计说明书](doc/迁移平台软件设计说明书.docx)** | Word | 可评审/归档的 Word 版（含架构图 PNG） |
+
+## 代码框架
+
+| 路径 | 说明 |
+|------|------|
+| **[platform/](platform/)** | Java 8 框架（按图3-2：接入/安全/编排/组件+Supervisor） |
+
+```bash
+cd platform && mvn -q clean package && java -jar platform-bootstrap/target/platform-bootstrap-0.1.0-SNAPSHOT.jar
+```
+
+详见 [platform/README.md](platform/README.md)。
 
 ## 配套资料
 
@@ -17,11 +29,11 @@
 | [doc/images/](doc/images/) | 架构图、模块图、流程图 PNG |
 | [doc/diagrams/](doc/diagrams/) | Mermaid 图源文件 |
 
-## 文档结构（SDD v3.3）
+## 文档结构（SDD v3.4）
 
 1. 引言  
-2. 系统概述  
-3. 系统架构设计（源-平台-目标；三层模块；含 AIEngine）  
+2. 系统概述（含用户 / 监管 / 基本功能需求思考维度）  
+3. 系统架构设计（源-平台-目标；三层模块；横切 Permission / Audit / Crypto；含 AIEngine）  
 4. 模块设计  
 5. 流程设计  
 6. 数据与接口设计  
