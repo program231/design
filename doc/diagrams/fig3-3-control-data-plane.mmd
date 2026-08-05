@@ -1,20 +1,28 @@
 flowchart LR
-    subgraph controlPlane [控制平面]
+    subgraph controlPlane [控制平面_任务决策与状态管理]
         API[API服务]
         Orchestrator[编排引擎]
-        Scheduler2[调度器]
-        MetaDB2[(元数据库)]
+        Scheduler[调度器]
+        MetaDB[(元数据库)]
+        Auth[身份认证]
+        Permission[Permission 权限]
+        Audit[Audit 审计]
+        Crypto[Crypto_KMS 密钥服务]
+        AI[AI建议服务]
     end
 
-    subgraph dataPlane2 [数据平面]
+    subgraph dataPlane [数据平面_实际数据读写]
+        SyncWorker[SyncWorker]
+        StreamRuntime[StreamRuntime]
+        Exec[执行组件]
         Source[(源库)]
         Target[(目标库)]
-        Engines[执行引擎]
     end
 
-    API --> Orchestrator
-    Orchestrator --> Scheduler2
-    Orchestrator --> MetaDB2
-    Scheduler2 --> Engines
-    Engines --> Source
-    Engines --> Target
+    API --> Orchestrator --> Scheduler
+    Scheduler -->|"下发作业"| SyncWorker
+    Exec -->|"位点与进度回写"| Scheduler
+    Exec -.->|"短期凭证"| Crypto
+    SyncWorker --> StreamRuntime --> Exec
+    Exec --> Source
+    Exec --> Target
