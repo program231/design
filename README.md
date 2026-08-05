@@ -1,6 +1,6 @@
 # design
 
-迁移平台设计文档
+迁移平台设计文档 + Java 8 基础框架
 
 ## 主交付文档
 
@@ -8,6 +8,18 @@
 |------|------|------|
 | **[迁移平台软件设计说明书](doc/迁移平台软件设计说明书.md)** | Markdown | **主交付文档（SDD v3.4）**：架构、模块、流程设计 |
 | **[迁移平台软件设计说明书](doc/迁移平台软件设计说明书.docx)** | Word | 可评审/归档的 Word 版（含架构图 PNG） |
+
+## 代码框架
+
+| 路径 | 说明 |
+|------|------|
+| **[platform/](platform/)** | Java 8 多模块骨架：SPI 插件、控制面/数据面、可跑通 demo |
+
+```bash
+cd platform && mvn -q clean test package && mvn -pl platform-bootstrap -am exec:java
+```
+
+详见 [platform/README.md](platform/README.md)。
 
 ## 配套资料
 

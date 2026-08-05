@@ -1,0 +1,6 @@
+{
+  "name": "demo-memory-reader",
+  "type": "READER",
+  "class": "com.migration.platform.plugins.demo.DemoMemoryReader",
+  "version": "0.1.0"
+}
