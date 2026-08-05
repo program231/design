@@ -1,48 +1,38 @@
 flowchart LR
-    Source[(源数据库)]
+    SourceDB[(源数据库)]
 
     subgraph platform [迁移平台]
         direction TB
-        Ctrl[集中管控]
-
+        subgraph control [集中管控]
+            Console[控制台]
+            OpenAPI[OpenAPI]
+            Auth[身份认证]
+            Perm[权限 Permission]
+            Audit[审计 Audit]
+            Crypto[加解密 Crypto]
+        end
         subgraph base [基础服务]
             CM[集群管理]
             RM[资源管理]
             HA[高可用]
             Meta[元数据管理]
         end
-
-        subgraph structFull [结构与全量]
+        subgraph full [结构与全量]
             Collect[结构采集与转化]
             SchemaMig[结构迁移]
             FullFlow[全量数据流]
         end
-
-        subgraph incrRead [日志读取]
-            Reader[Reader]
-            Filter1[Filter]
-            Queue[Queue]
+        AI[AI智能_映射建议与异常诊断]
+        subgraph incr [增量管道]
+            LogRead[日志读取_Reader_Filter_Queue]
+            SyncWrite[同步写入_Filter_Mapping_冲突检测]
+            LogRead <--> SyncWrite
         end
-
-        subgraph incrWrite [同步写入]
-            Filter2[Filter]
-            Mapping[Mapping]
-            Conflict[冲突检测]
-        end
-
-        AI[AI智能<br/>映射建议与异常诊断]
-
-        Ctrl --> base
-        base --> structFull
-        structFull --> incrRead
-        incrRead <--> incrWrite
-        AI -.-> Collect
-        AI -.-> Conflict
     end
 
-    Target[(目标数据库)]
+    TargetDB[(目标数据库)]
     MQ[消息队列]
 
-    Source --> platform
-    platform --> Target
+    SourceDB <--> platform
+    platform <--> TargetDB
     platform --> MQ

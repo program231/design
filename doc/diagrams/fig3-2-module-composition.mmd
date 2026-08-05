@@ -7,6 +7,13 @@ flowchart TB
         P4[告警设置]
     end
 
+    subgraph security [横切安全]
+        direction LR
+        S1[Permission 权限]
+        S2[Audit 审计]
+        S3[Crypto 加解密]
+    end
+
     subgraph orch [流程编排层]
         direction LR
         O1[数据库对象迁移]
@@ -18,17 +25,17 @@ flowchart TB
 
     subgraph comps [组件层]
         direction LR
-        C1[DBCat<br/>转换引擎]
-        C2[Store<br/>增量拉取]
-        C3[FullImport<br/>全量导入]
-        C4[IncrSync<br/>增量同步]
-        C5[FullVerification<br/>全量校验]
-        C6[AIEngine<br/>智能辅助]
+        C1[DBCat 转换引擎]
+        C2[Store 增量拉取]
+        C3[FullImport 全量导入]
+        C4[IncrSync 增量同步]
+        C5[FullVerification 全量校验]
+        C6[AIEngine 智能辅助]
     end
 
     Sup[Supervisor 组件监控]
 
-    access --> orch --> comps
+    access --> security --> orch --> comps
     C1 --- Sup
     C2 --- Sup
     C3 --- Sup
