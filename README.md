@@ -16,7 +16,7 @@
 | **[platform/](platform/)** | Java 8 多模块骨架：SPI 插件、控制面/数据面、可跑通 demo |
 
 ```bash
-cd platform && mvn -q clean test package && mvn -pl platform-bootstrap -am exec:java -Dexec.mainClass=com.migration.platform.bootstrap.DemoBootstrap
+cd platform && mvn -q clean package && java -jar platform-bootstrap/target/platform-bootstrap-0.1.0-SNAPSHOT.jar
 ```
 
 详见 [platform/README.md](platform/README.md)。

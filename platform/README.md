@@ -25,9 +25,11 @@
 
 ```bash
 cd platform
-mvn -q clean test package
-mvn -pl platform-bootstrap -am exec:java -Dexec.mainClass=com.migration.platform.bootstrap.DemoBootstrap
+mvn -q clean package
+java -jar platform-bootstrap/target/platform-bootstrap-0.1.0-SNAPSHOT.jar
 ```
+
+也可：`mvn -q clean install && mvn -pl platform-bootstrap exec:java`
 
 Demo 流程：注册 demo 插件 → 权限/审计校验 → 控制面下发作业 → SyncWorker 跑通 50 行内存全量管道 → 打印吞吐统计。
 
