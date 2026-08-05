@@ -1,59 +1,56 @@
-# Migration Platform (Java 8)
+# Migration Platform（按设计图对齐的 Java 8 框架）
 
-基于《迁移平台软件设计说明书》落地的 **分布式 / 低耦合 / 组件可拔插** Java 8 基础框架。
+对应 SDD 图：
 
-## 模块
+- 图 3-1 逻辑架构（源 → 平台 → 目标）
+- 图 3-2 三层模块 + 横切安全 + Supervisor
+- 图 3-3 控制平面 / 数据平面
 
-| 模块 | 职责 |
-|------|------|
-| `platform-spi` | Reader/Writer/LogAdapter/TypeMapper SPI；Permission/Audit/Crypto 安全 SPI；Record 模型 |
-| `platform-core` | Channel、插件容器（ClassLoader 隔离 + plugin.json）、统计、安全占位实现 |
-| `platform-component-api` | DBCat/FullImport/Store/IncrSync/Verifier/AIEngine/Supervisor 组件契约 |
-| `platform-control` | 控制面：编排、元数据、节点注册、作业下发、Supervisor |
-| `platform-runtime` | 数据面：SyncWorker（Reader→Channel→Writer）、StreamRuntime 骨架 |
-| `platform-plugins-demo` | 内存 Reader/Writer 示例插件 |
-| `platform-bootstrap` | 本地端到端 demo 入口 |
+## 与设计图映射
 
-依赖方向：`bootstrap → control/runtime/plugins → component-api/core → spi`（单向，无实现互引）。
+| 设计图模块 | 代码位置 |
+|------------|----------|
+| 服务接入层·传输项目管理 | `platform-access` → `TransferProjectService` |
+| 服务接入层·数据源管理 | `platform-access` → `DatasourceService` |
+| 服务接入层·运维监控 | `platform-access` → `OpsMonitorService` |
+| 服务接入层·告警设置 | `platform-access` → `AlarmService` |
+| 横切·Permission / Audit / Crypto | `platform-spi` + `platform-core.security` |
+| 编排·对象/数据/同步/校验/切换 | `platform-control.workflow.*Stage` + `WorkflowEngine` |
+| 组件·DBCat | `runtime.component.DbCatComponent` |
+| 组件·Store | `runtime.component.StoreComponent` |
+| 组件·FullImport | `runtime.component.DefaultFullImporter` + `SyncWorker` |
+| 组件·IncrSync | `runtime.component.IncrSyncComponent` |
+| 组件·FullVerification | `runtime.component.FullVerificationComponent` |
+| 组件·AIEngine | `runtime.component.AiEngineComponent` |
+| Supervisor | `control.supervisor.DefaultSupervisor` |
+| 控制面/数据面 | `platform-control` / `platform-runtime` |
 
-## 环境
+## 模块依赖（单向）
 
-- JDK 8+（源码与字节码目标为 **1.8**）
-- Maven 3.6+
+```text
+bootstrap
+  → access, control, runtime, plugins-demo
+access → control, core, spi
+control → component-api, core, spi
+runtime → component-api, core, spi
+component-api → core, spi
+core → spi
+```
 
 ## 构建与运行
 
 ```bash
 cd platform
-mvn -q clean package
+mvn -q clean test package
 java -jar platform-bootstrap/target/platform-bootstrap-0.1.0-SNAPSHOT.jar
 ```
 
-也可：`mvn -q clean install && mvn -pl platform-bootstrap exec:java`
+Demo 按图 3-2 跑通：接入层建项目 → 安全审计 → 编排五阶段（对象→全量→增量→校验→切换）→ Supervisor 心跳。
 
-Demo 流程：注册 demo 插件 → 权限/审计校验 → 控制面下发作业 → SyncWorker 跑通 50 行内存全量管道 → 打印吞吐统计。
+## 新增可拔插组件/插件
 
-## 新增插件
+1. 实现组件接口（`SchemaMigrator` / `FullImporter` / …）或 Reader/Writer SPI  
+2. 插件放 `plugin.json` + jar，由 `PluginContainer.loadDirectory` 加载  
+3. 在 `WorkflowEngine` 注册对应 `StageHandler`
 
-1. 实现 `ReaderPlugin` / `WriterPlugin`（或 LogAdapter / TypeMapper）
-2. 提供 `plugin.json`：
-
-```json
-{
-  "name": "my-reader",
-  "type": "READER",
-  "class": "com.example.MyReader",
-  "version": "0.1.0"
-}
-```
-
-3. 放入插件目录（含 jar 或 `classes/`），调用 `PluginContainer.loadDirectory(dir)`；本地也可 `registerInProcess(...)`。
-
-## 设计对齐
-
-- 控制面 / 数据面分离（Orchestrator + JobDispatcher ↔ SyncWorker / StreamRuntime）
-- 分布式基础：`InMemoryNodeRegistry` 心跳与作业路由（可替换 ZK/etcd）
-- 安全横切 SPI：`PermissionService` / `AuditService` / `CryptoService`
-- 全量管道严格 Writer 先启动，Channel 背压
-
-> 本骨架不含真实 JDBC/CDC 生产实现；安全加解密为 Demo 占位，不可用于生产。
+> 骨架不含真实 JDBC/CDC；Crypto 为 Demo 占位，不可用于生产。

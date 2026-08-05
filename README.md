@@ -13,7 +13,7 @@
 
 | 路径 | 说明 |
 |------|------|
-| **[platform/](platform/)** | Java 8 多模块骨架：SPI 插件、控制面/数据面、可跑通 demo |
+| **[platform/](platform/)** | Java 8 框架（按图3-2：接入/安全/编排/组件+Supervisor） |
 
 ```bash
 cd platform && mvn -q clean package && java -jar platform-bootstrap/target/platform-bootstrap-0.1.0-SNAPSHOT.jar

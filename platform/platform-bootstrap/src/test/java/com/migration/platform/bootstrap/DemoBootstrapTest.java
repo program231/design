@@ -7,7 +7,7 @@ import org.junit.Test;
 public class DemoBootstrapTest {
 
     @Test
-    public void runDemoMain() throws Exception {
+    public void runDiagramAlignedDemo() throws Exception {
         DemoMemoryWriter.clearSink();
         DemoBootstrap.main(new String[0]);
         Assert.assertEquals(50, DemoMemoryWriter.sinkSnapshot().size());

@@ -16,6 +16,7 @@
         <module>platform-core</module>
         <module>platform-component-api</module>
         <module>platform-control</module>
+        <module>platform-access</module>
         <module>platform-runtime</module>
         <module>platform-plugins-demo</module>
         <module>platform-bootstrap</module>
@@ -49,6 +50,11 @@
             <dependency>
                 <groupId>com.migration.platform</groupId>
                 <artifactId>platform-control</artifactId>
+                <version>${platform.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.migration.platform</groupId>
+                <artifactId>platform-access</artifactId>
                 <version>${platform.version}</version>
             </dependency>
             <dependency>

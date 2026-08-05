@@ -29,6 +29,10 @@
         </dependency>
         <dependency>
             <groupId>com.migration.platform</groupId>
+            <artifactId>platform-access</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.migration.platform</groupId>
             <artifactId>platform-runtime</artifactId>
         </dependency>
         <dependency>
